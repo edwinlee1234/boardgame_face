@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/page/Home'
 import GameLobby from '@/page/GameLobby'
-import JaipurRoom from '@/page/gamepage/room/JaipurRoom'
+import Room from '@/page/Room'
 
 Vue.use(Router)
 
@@ -19,9 +19,10 @@ export default new Router({
       component: GameLobby,
     },
     {
-      path: '/game/room/jaipur',
-      name: 'JaipurRoom',
-      component: JaipurRoom,
+      path: '/game/room/:gametype/:id',
+      name: 'Room',
+      component: Room,
+      props: true,
     },    
 
   ]
