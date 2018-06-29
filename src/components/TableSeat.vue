@@ -14,7 +14,6 @@
                 <div class="row" :id="player.id">
                     <div class="col">
                         <p>{{player.name}}</p>
-                        <p>桌主</p>
                     </div>
                 </div>
             </div>

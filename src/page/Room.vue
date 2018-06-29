@@ -20,7 +20,17 @@
                 <div v-if="opening" @click="startGame()" class="btn btn-primary">
                     開始遊戲
                 </div>
+                <div v-if="opening" @click="startGame()" class="btn btn-danger">
+                    放棄本桌
+                </div>              
             </div>
+        </div>
+        <div v-else class="row">
+            <div class="col offset-md-4">
+                <div v-if="opening" @click="startGame()" class="btn btn-danger">
+                    離開本桌
+                </div>  
+            </div>    
         </div>
     </div>
 </template>
@@ -36,7 +46,7 @@
 
         props: [
             'gametype',
-            'id',
+            'gameID',
         ],
 
         data () {
@@ -49,14 +59,13 @@
                 ],
                 owner: false,
                 opening: false,
-                gameID: null,
             }
         },
 
         mounted() {
             // 從開始遊戲進來這邊id會是0
-            console.log(this.id);
-            if (this.id == '0') {
+            console.log(this.gameID);
+            if (this.gameID == '0') {
                 this.createGame();
                 this.owner = true;
             } else {
@@ -87,7 +96,8 @@
                     // 有舊遊戲的情況
                     if (response.data.data.oldGameID > 0) {
                         let id = response.data.data.oldGameID[0]
-                        window.location = BASE + "game/room/jaipur/" + id;
+                        let gameType = response.data.data.gameType[0]
+                        window.location = BASE + "game/room/" + gameType + "/" + id;
                         window.location.reload(true);
                         return;
                     }
@@ -118,8 +128,8 @@
                     if (response.data.status == "success") {
                         console.log(response.data);
                         self.playersInfo = response.data.players;
-                        self.owner = response.data.owner
-                        self.opening = response.data.opening
+                        self.owner = response.data.owner;
+                        self.opening = response.data.opening;
                     }
                 })
                 .catch(function (error) {
@@ -135,11 +145,25 @@
                 this.conn.onclose = function (evt) {
                     console.log(evt);
                     console.log("WebSocket Close");
-                    this.conn = null
+                    this.conn = null;
+                    GAMEWS = null;
                 };
 
                 this.conn.onmessage = function (evt) {
-                    console.log(evt.data);
+                    let res = JSON.parse(evt.data);
+                    // 玩家變動
+                    if (res.event == "ChangePlayer") {
+                        self.playersInfo = res.data;
+                    }
+
+                    // 開始遊戲
+                    if (res.event == "StartGame") {
+                        let id = res.data.gameID
+                        let gameType = res.data.gameType
+                        window.location = BASE + "game/view/" + gameType + "/" + id;
+                        window.location.reload(true);
+                        return;
+                    }                   
                 };
             },
 
@@ -173,7 +197,30 @@
             },
 
             startGame() {
-                    
+                // owner的功能
+                if(!this.owner) {
+                    return;
+                }
+
+                axios({
+                    method: 'put',
+                    url: APIURL + '/api/game/startgame?id='+this.gameID,
+                })
+                .then(function(response) {
+                    if (response.data.status == "success") {
+                        let id = response.data.data.gameID
+                        let gameType = response.data.data.gameType
+                        window.location = BASE + "game/view/" + gameType + "/" + id;
+                        window.location.reload(true);
+
+                        return;
+                    }
+
+                    console.log("Open Game ERROR");
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });                
             },
 
             close() {

@@ -106,12 +106,13 @@
 
             joinGame(gameID) {
                 axios({
-                    method: 'get',
+                    method: 'put',
                     url: APIURL + '/api/game/joingame?id=' + gameID,
                 })
                 .then(function(response) {
+                    console.log(response);
                     if (response.data.status == "success") {
-                        window.location = BASE + "game/room/" + response.data.gameType + "/" + response.data.gameID;
+                        window.location = BASE + "game/room/" + response.data.data.gameType[0] + "/" + response.data.data.gameID[0];
                     }
                 })
                 .catch(function (error) {

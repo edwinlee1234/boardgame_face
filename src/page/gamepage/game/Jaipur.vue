@@ -1,18 +1,15 @@
 <template>
-    <div id="setting">
-        <h2>Setting</h2>
-        <input type="text">
+    <div id="jaipur-game-page">
+        <h2>Jaipur</h2>
     </div>
 </template>
 
 <script>
     export default {
-        name: 'Setting',
+        name: 'Jaipur',
 
         props: [
-            // 同時是owner & not opening才可以調設定值
-            'owner',
-            'opening',
+            'gameID',
         ],
 
         data () {
@@ -22,7 +19,7 @@
         },
 
         mounted() {
-            // 去撈這款遊戲的設定
+            
         },
 
         methods: {
