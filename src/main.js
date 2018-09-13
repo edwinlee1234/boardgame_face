@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
+import store from './store'
 
 Vue.config.productionTip = false
 window.axios = axios
@@ -12,8 +13,8 @@ window.Vue = Vue
 axios.defaults.withCredentials = true;  
 
 window.BASE = "http://localhost:8787/#/";
-window.APIURL = "http://localhost:8989";
-window.WSURL = "localhost:8989";
+window.APIURL = "http://localhost:8300";
+window.WSURL = "localhost:8300";
 window.LOBBYWS = null;
 window.GAMEWS = null;
 
@@ -21,6 +22,7 @@ window.GAMEWS = null;
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

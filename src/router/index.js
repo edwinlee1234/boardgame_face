@@ -4,6 +4,8 @@ import Home from '@/page/Home'
 import GameLobby from '@/page/GameLobby'
 import Room from '@/page/Room'
 import Jaipur from '@/page/gamepage/game/Jaipur'
+import Login from '@/page/user/Login'
+import Register from '@/page/user/Register'
 
 Vue.use(Router)
 
@@ -30,6 +32,16 @@ export default new Router({
       name: 'Jaipur',
       component: Jaipur,
       props: true,
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login,      
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: Register,
     },
   ]
 })
