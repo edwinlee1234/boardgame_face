@@ -15,6 +15,24 @@ export default {
     Nav,
   },
 
+  mounted() {
+    // Init user Info
+    axios({
+        method: 'get',
+        url: APIURL + '/init',
+        responseType: 'json',
+    })              
+    .then((response) => {
+      if (response.data.status === 'success') {
+        this.$store.dispatch('setUserInfo', response.data)
+      } else {
+        console.log('init ERROR')
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+  }
 }
 </script>
 

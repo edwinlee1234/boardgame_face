@@ -6,9 +6,7 @@
             <div class="card-body">
                 <h5 class="card-title"></h5>
                 <p class="card-text">{{ game }}</p>
-                <router-link :to="{path: '/game/room/' + game + '/0'}">
-                    <a href="#" class="btn btn-primary">開始遊戲</a>
-                </router-link>
+                <button type="button" class="btn btn-info" @click="createRoom(game)" href="#">開始遊戲</button>
             </div>
         </div>
         <hr>
@@ -38,6 +36,8 @@
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+
     export default {
         name: 'GameLobby',
 
@@ -46,6 +46,12 @@
                 games: [],
                 openingGames: [],
             }
+        },
+
+        computed: {
+            ...mapGetters({
+                gameID: 'getGameID',
+            })
         },
 
         mounted() {
@@ -102,6 +108,15 @@
 
             close() {
                 this.conn.close();
+            },
+
+            createRoom(gameType) {
+                if (this.gameID) {
+                    alert("已有加入遊戲，不可再開新局")
+                    return
+                }
+
+                window.location = BASE + "game/room/" + gameType + "/0";
             },
 
             joinGame(gameID) {

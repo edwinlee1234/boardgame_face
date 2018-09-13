@@ -17,16 +17,35 @@
                         <router-link to="/gamelobby">開始遊戲</router-link>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Pricing</a>
+                <li class="nav-item" v-if="!userName">
+                    <a class="nav-link" href="#">
+                        <router-link to="/login">登入</router-link>
+                    </a>
                 </li>
+                <li class="nav-item" v-if="!userName">
+                    <a class="nav-link" href="#">
+                        <router-link to="/register">註冊</router-link>
+                    </a>
+                </li>
+                <li class="nav-item" v-if="userName">
+                    <a class="nav-link" href="#">
+                        <router-link to="/">Hello! {{ userName }} 會員中心</router-link>
+                    </a>
+                </li>                                
                 </ul>
+            </div>
+
+            <div class="existGameBar" v-if="gameID && gameType">
+                <h3>Exist Game</h3>
+                <h3 @click="redirect()">你已有加入遊戲 #{{ gameID }}:{{ gameType }}</h3>
             </div>
         </nav>
     </div>
 </template>
 
 <script>
+    import { mapGetters } from 'vuex'
+    
     export default {
         name: 'Nav',
 
@@ -35,11 +54,25 @@
             }
         },
 
+        computed: {
+            ...mapGetters({
+                userName: 'getUserName',
+                gameID: 'getGameID',
+                gameType: 'getGameType',
+            })
+        },
+
         mounted() {
 
         },
 
         methods: {
+            // 轉去Room
+            redirect() {
+                window.location = BASE + "game/room/" + gameType + "/" + gameID;
+                window.location.reload(true);
+                return;
+            }
         }
     }
 </script>
