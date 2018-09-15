@@ -43,7 +43,10 @@
                 }
             })              
             .then((response) => {
-              console.log(response);
+              if (response.data.status === "success") {
+                alert("註冊成功")
+                this.$router.push('/login')
+              }
             })
             .catch((error) => {
               console.log(error);

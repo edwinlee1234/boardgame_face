@@ -1,0 +1,17 @@
+// LOGIN_WORNG 登入失敗
+export const LOGIN_WORNG = "00001"
+
+// DATA_EMPTY
+export const DATA_EMPTY = "00002"
+
+// UNEXPECT_ERROR
+export const UNEXPECT_ERROR = "00003"
+
+// EXIST_USER 已有存在user name不可重復
+export const EXIST_USER = "00004"
+
+// EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE 已加入遊戲不可再開新局
+export const EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE = "00005"
+
+// NOT_AUTHORIZATION
+export const NOT_AUTHORIZATION = "00006"

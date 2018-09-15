@@ -37,10 +37,14 @@
                 }
             })              
             .then((response) => {
-              console.log(response);
+              if (response.data.status === "success") {
+                alert("登入成功")
+                window.location = BASE + "gamelobby"
+                window.location.reload(true);
+              }
             })
             .catch((error) => {
-              console.log(error);
+              console.log(error)
             });
           }
         }

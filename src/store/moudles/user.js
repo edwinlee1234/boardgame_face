@@ -12,7 +12,7 @@ export default {
     [TYPES.SET_USER_INFO](state, payload) {
       for ( let index in payload) {
         for (let sIndex in state) {
-          if (index === sIndex && payload[index] && state[sIndex] !== payload[index]) {
+          if (index === sIndex && typeof payload[index] !== 'undefined' && state[sIndex] !== payload[index]) {
             state[sIndex] = payload[index]
           }
         }

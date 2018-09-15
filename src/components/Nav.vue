@@ -69,7 +69,7 @@
         methods: {
             // 轉去Room
             redirect() {
-                window.location = BASE + "game/room/" + gameType + "/" + gameID;
+                window.location = BASE + "game/room/" + this.gameType + "/" + this.gameID;
                 window.location.reload(true);
                 return;
             }

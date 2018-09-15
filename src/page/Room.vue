@@ -5,7 +5,7 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <JaipurSetting v-if="gametype === 'jaipur'" v-bind:owner="owner" v-bind:opening="opening"></JaipurSetting>
+                <JaipurSetting v-if="gametype === 'jaipur'" v-bind:owner="owner" v-bind:opening="roomState"></JaipurSetting>
             </div>
             <div class="col">
                 <TableSeat v-bind:playersInfo="playersInfo"></TableSeat>
@@ -14,20 +14,26 @@
         <!-- 場主才有的功能 -->
         <div v-if="owner" class="row">
             <div class="col offset-md-4">
-                <div v-if="!opening" @click="openPlayer()" class="btn btn-primary">
+                <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
+                    進入遊戲
+                </div>
+                <div v-if="roomState === 'notOpen'" @click="openPlayer()" class="btn btn-primary">
                     開放玩家
                 </div>
-                <div v-if="opening" @click="startGame()" class="btn btn-primary">
+                <div v-if="roomState === 'opening'" @click="startGame()" class="btn btn-primary">
                     開始遊戲
                 </div>
-                <div v-if="opening" @click="startGame()" class="btn btn-danger">
+                <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
                     放棄本桌
                 </div>              
             </div>
         </div>
         <div v-else class="row">
             <div class="col offset-md-4">
-                <div v-if="opening" @click="startGame()" class="btn btn-danger">
+                <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
+                    進入遊戲
+                </div>
+                <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
                     離開本桌
                 </div>  
             </div>    
@@ -40,6 +46,8 @@
     // TODO 
     // 動態的更換這一個頁面
     import JaipurSetting from '@/page/gamepage/setting/JaipurSetting';
+    import * as errorCode from '@/config/errorcode'
+    import { mapGetters } from 'vuex'
 
     export default {
         name: 'Room',
@@ -49,61 +57,65 @@
             'gameID',
         ],
 
+        computed: {
+            ...mapGetters({
+                userName: 'getUserName',
+            })
+        },
+
         data () {
             return {
                 conn: "",
                 uuid: "",
+                gameType: "",
                 playersInfo: [
                     // {id: 1, name: "player"},
                     // {id: 2, name: "player2"},
                 ],
                 owner: false,
-                opening: false,
+                roomState: "",
             }
         },
 
         mounted() {
             // 從開始遊戲進來這邊id會是0
-            console.log(this.gameID);
+            console.log(this.gameID)
             if (this.gameID == '0') {
-                this.createGame();
-                this.owner = true;
+                this.createGame()
+                this.owner = true
             } else {
-                this.roomInit();
+                this.wsInit()
+                this.getRoomInfo()
             }
         },
 
         methods: {
             createGame() {
-                let self = this;
-
-                // 開新桌
                 axios({
-                    method: "get",
+                    method: "put",
                     url: APIURL + '/api/creategame?game=' + this.gametype,
                     responseType: 'json',
                 })
-                .then(function (response) {
-                    if (response.data.status == "success") {
-                        self.gameID = response.data.data.gameID[0];
-                        console.log(response.data.data.gameID[0]);
-                        console.log(self.gameID);
+                .then((response) => {
+                    if (response.data.status === "success") {
+                        this.gameID = response.data.data.gameID[0];
 
-                        self.roomInit();
-                        return;
+                        this.getRoomInfo()
+                        return
                     } 
 
-                    // 有舊遊戲的情況
-                    if (response.data.data.oldGameID > 0) {
-                        let id = response.data.data.oldGameID[0]
-                        let gameType = response.data.data.gameType[0]
-                        window.location = BASE + "game/room/" + gameType + "/" + id;
-                        window.location.reload(true);
-                        return;
+                    if (response.data.error.error_code === errorCode.EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE) {
+                        alert("已存在舊遊戲，不可開新局")
                     }
 
-                    // 應該是不會出現這個
-                    // 有舊遊戲的session沒有被清掉
+                    if (response.data.error.error_code === errorCode.NOT_AUTHORIZATION) {
+                        alert("請先登入")
+                    }
+
+                    if (response.data.error.error_code === errorCode.UNEXPECT_ERROR) {
+                        alert("SYETEM ERROR")
+                    }
+
                     window.location = BASE + "gamelobby";
                 })
                 .catch(function (error) {
@@ -111,25 +123,31 @@
                 });  
             },
 
-            roomInit() {
+            wsInit() {
                 // 連線ws
                 this.conn = GAMEWS; 
                 if (this.conn === null) {
                     this.open();
                 }
+            },
 
+            getRoomInfo() {
                 // init room的資料
-                let self = this;
                 axios({
                     method: 'get',
-                    url: APIURL + '/api/game/roomInfo?id=' + this.gameID + '&game=' + this.gametype,
+                    url: APIURL + '/api/game/roomInfo?id=' + this.gameID + '&game=' + this.gameType,
                 })
-                .then(function(response) {
+                .then((response) => {
                     if (response.data.status == "success") {
-                        console.log(response.data);
-                        self.playersInfo = response.data.players;
-                        self.owner = response.data.owner;
-                        self.opening = response.data.opening;
+                        this.playersInfo = response.data.players;
+                        this.owner = response.data.owner;
+                        this.roomState = response.data.roomState;
+                        this.gameType = response.data.gameType;
+
+                        this.$store.dispatch('setUserInfo', {
+                            gameID: response.data.gameID,
+                            gameType: response.data.gameType
+                        })
                     }
                 })
                 .catch(function (error) {
@@ -139,7 +157,7 @@
 
             open() {
                 let self = this
-                this.conn = new WebSocket("ws://localhost:8989/ws?channel="+this.gametype+"&id="+this.gameID);
+                this.conn = new WebSocket("ws://" + WSURL + "/ws?channel="+this.gametype+"&id="+this.gameID);
                 console.log(this.conn);
 
                 this.conn.onclose = function (evt) {
@@ -161,9 +179,19 @@
                         let id = res.data.gameID
                         let gameType = res.data.gameType
                         window.location = BASE + "game/view/" + gameType + "/" + id;
-                        window.location.reload(true);
-                        return;
-                    }                   
+                        return
+                    }      
+                    
+                    // 被踢了
+                    if (res.event == "Kick") {
+                        for (let i = 0; i < res.data.length; i++) {
+                            if (res.data[i].name == self.userName) {
+                                window.location = BASE + "gamelobby";
+                                window.location.reload(true);
+                                return;
+                            }                   
+                        }
+                    }                       
                 };
             },
 
@@ -188,7 +216,7 @@
                 .then(function(response) {
                     if (response.data.status == "success") {
                         console.log(response.data);
-                        self.opening = true;
+                        self.roomState = "opening";
                     }
                 })
                 .catch(function (error) {
@@ -211,7 +239,6 @@
                         let id = response.data.data.gameID
                         let gameType = response.data.data.gameType
                         window.location = BASE + "game/view/" + gameType + "/" + id;
-                        window.location.reload(true);
 
                         return;
                     }
@@ -223,9 +250,34 @@
                 });                
             },
 
+            enterGame() {
+                window.location = BASE + "game/view/" + this.gameType + "/" + this.gameID;
+                window.location.reload(true);
+            },
+
             close() {
                 this.conn.close();
             },
+
+            leaveGame() {
+                axios({
+                    method: "put",
+                    url: APIURL + '/api/game/roomClose?id=' + this.gameID,
+                    responseType: 'json',
+                })
+                .then((response) => {
+                    if (response.data.status === "success") {
+                        this.$store.dispatch('setUserInfo', {
+                            gameID: 0,
+                        })
+
+                        window.location = BASE + "gamelobby";
+                    } 
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });  
+            }
         },
 
         components: {
