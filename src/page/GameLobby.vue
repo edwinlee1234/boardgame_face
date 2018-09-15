@@ -1,36 +1,50 @@
 <template>
     <div id="GameLobby">
-        <h1>Game</h1>
-        <div v-for="game in games" :key="game" class="card" style="width: 18rem;">
-            <img class="card-img-top" src="" alt="Card image cap">
-            <div class="card-body">
-                <h5 class="card-title"></h5>
-                <p class="card-text">{{ game }}</p>
-                <button type="button" class="btn btn-info" @click="createRoom(game)" href="#">開始遊戲</button>
+        <div class="container">
+          <div class="game-list-box">
+            <h2>遊戲列表</h2>
+            <div v-for="game in games" :key="game" class="card" @click="createRoom(game)">
+              <div class="card-title-my">
+                {{ game }}
+              </div>
+              <img class="card-image" :src="findImages(game)">
             </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div v-for="(openingGame, index) in openingGames" 
-            :key="index" 
-            class="opening-game" 
-            :id="openingGame.gameID">
-                <div class="col-12">
-                    <h2>{{ openingGame.gameType }}</h2>
-                    <!-- 玩家 -->
-                    <p v-for="(player, index) in openingGame.players" :key="index">
-                        Player: {{ player.name }}
-                    </p>
-                    <!-- 空位 -->
-                    <p v-for="empty in openingGame.emptySeat" :key="empty">
-                        缺
-                    </p>
-                    <p>創立時間： {{ openingGame.time }}</p>
-                    <div class="btn btn-primary" @click="joinGame(openingGame.gameID)">
-                        加入遊戲
+          </div>
+          <div class="room-list-box">
+            <div class="row"  v-for="(openingGame, index) in openingGames" :key="index" @click="joinGame(openingGame.gameID)">
+                <div class="room-box" :id="openingGame.gameID">
+                    <div class="col-12">
+                      <div class="row">
+                        <div class="col-2">
+                          <img class="room-box-image" :src="findImages(openingGame.gameType)" alt="">
+                        </div>
+                        <div class="col-2">
+                          <h2>{{ openingGame.gameType }}</h2>
+                        </div>
+                        <div class="col">
+                          <p>創立時間： {{ openingGame.time }}</p>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-12">
+                          <!-- 玩家 -->
+                          <span class="user" v-for="(player, index) in openingGame.players" :key="index">
+                              <i class="far fa-user"></i> {{ player.name }}
+                          </span>
+                          <!-- 空位 -->
+                          <span class="user" v-for="empty in openingGame.emptySeat" :key="empty">
+                              <i class="far fa-user"></i> 缺
+                          </span>
+                        </div>
+                      </div>
+                        <!-- <div class="btn btn-primary" ">
+                            加入遊戲
+                        </div> -->
                     </div>
                 </div>
             </div>
+          </div>
         </div>
     </div>
 </template>
@@ -38,6 +52,7 @@
 <script>
     import { mapGetters } from 'vuex'
     import * as errorCode from '@/config/errorcode'
+    import imagesPath from '@/config/images'
 
     export default {
         name: 'GameLobby',
@@ -61,7 +76,7 @@
             axios.get(APIURL + '/api/gamesupport')
             .then((response) => {
                 if (response.data.status == "success") {
-                    this.games = response.data.data["games"]
+                  this.games = response.data.data.games
                 }
             })
             .catch(function (error) {
@@ -182,10 +197,97 @@
                     console.log(error);
                 });                
             },
+
+            findImages(gameType) {
+              let fullPath = ''
+              let fileName = imagesPath[gameType]
+
+              if (fileName) {
+                fullPath =  imagesPath.base + fileName
+              }
+
+              return fullPath
+            }
         }
     }
 </script>
 
 <style lang="scss" scoped>
+#GameLobby {
+  .room-list-box {
+    margin-top: 10px;
+    padding: 30px;
+    border: solid 1px;
+    border-radius: 5px;
 
+    .room-box {
+      vertical-align: center;
+      padding: 20px;
+      cursor: pointer;
+      width: 100%;
+      border: solid 1px;
+      border-radius: 5px;
+
+      p {
+        padding-top: 5px;
+      }
+
+      .room-box-image {
+        width: 80px;
+        height: 80px;
+      }
+
+      .user {
+        display: inline-block;
+        width: 100px;
+        height: 35px;
+      }
+
+      .fa-user { 
+        font-size: 30px;
+      }
+
+      &:hover {
+        box-shadow: 5px 5px 10px 10px
+      }
+    }
+  }
+
+  .game-list-box {
+    h2 {
+      margin-bottom: 25px;
+    }
+
+    padding: 30px;
+    margin-top: 30px;
+    border: solid 1px;
+    border-radius: 5px;
+  }
+
+  .card {
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    padding: 15px;
+    position: relative;
+    height: 220px;
+    width: 180px;
+
+    .card-title-my {
+      font-size: 20px;
+      padding-bottom: 5px;
+      border-bottom: solid 1px;
+      margin-bottom: 15px;
+    }
+
+    .card-image {
+      width: 125px;
+      height: 125px;
+    }
+
+    &:hover {
+      box-shadow: 5px 5px 10px 10px
+    }
+  }
+}
 </style>
