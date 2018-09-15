@@ -1,7 +1,7 @@
 <template>
     <div id="Nav">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Navbar</a>
+            <a class="navbar-brand" href="#">Board Game</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -16,28 +16,33 @@
                     <a class="nav-link" href="#">
                         <router-link to="/gamelobby">開始遊戲</router-link>
                     </a>
-                </li>
-                <li class="nav-item" v-if="!userName">
-                    <a class="nav-link" href="#">
-                        <router-link to="/login">登入</router-link>
-                    </a>
-                </li>
-                <li class="nav-item" v-if="!userName">
-                    <a class="nav-link" href="#">
-                        <router-link to="/register">註冊</router-link>
-                    </a>
-                </li>
-                <li class="nav-item" v-if="userName">
-                    <a class="nav-link" href="#">
-                        <router-link to="/">Hello! {{ userName }} 會員中心</router-link>
-                    </a>
-                </li>                                
+                </li>                             
                 </ul>
             </div>
 
+            <div class="rightNav">
+                <span v-if="!userName">
+                    <a href="#">
+                        <router-link to="/login">登入</router-link>
+                    </a>
+                </span>
+                <span v-if="!userName">
+                    <a href="#">
+                        <router-link to="/register">註冊</router-link>
+                    </a>
+                </span>
+                <span v-if="userName">
+                    <a href="#">
+                        <router-link to="/">Hello! {{ userName }} 會員中心</router-link>
+                    </a>
+                    <a href="#">
+                        <router-link to="/">登出</router-link>
+                    </a>                    
+                </span>   
+            </div>
+
             <div class="existGameBar" v-if="gameID && gameType">
-                <h3>Exist Game</h3>
-                <h3 @click="redirect()">你已有加入遊戲 #{{ gameID }}:{{ gameType }}</h3>
+                <p @click="redirect()">你已有加入遊戲 #{{ gameID }}:{{ gameType }}</p>
             </div>
         </nav>
     </div>
@@ -79,4 +84,18 @@
 
 <style lang="scss" scoped>
 
+.existGameBar {
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    left: 40%;
+    top: 13px;
+}
+
+.rightNav {
+    span {
+        margin-right: 8px;
+        margin-left: 8px;
+    }
+}
 </style>
