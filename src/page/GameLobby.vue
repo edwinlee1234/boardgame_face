@@ -166,6 +166,11 @@
             },
 
             joinGame(joinGameID) {
+                if (!this.userName) {
+                    alert("請先登入")
+                    return
+                }
+
                 if (this.gameID) {
                     alert("已有加入遊戲，不可再加入新局")
                     return
@@ -192,6 +197,11 @@
                         alert("已有加入遊戲，不可再加入新局")
                         return
                     }
+
+                    if (response.data.error.error_code === errorCode.NOT_AUTHORIZATION) {
+                        alert("請先登入")
+                        return
+                    }                    
                 })
                 .catch(function (error) {
                     console.log(error);

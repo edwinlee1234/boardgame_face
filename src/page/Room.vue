@@ -1,42 +1,54 @@
 <template>
     <div id="JaipurRoom">
-        <div class="jumbotron">
-            <h1 class="display-4">{{gametype}} Room!</h1>
+        <div class="gameBoard">
+            <div class="row">
+                <div class="col-3">
+                    <h1>IMG</h1>
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <h1>{{gametype}} Room!</h1>
+                        </div>
+                    </div>
+                    <br>
+                    <!-- 場主才有的功能 -->
+                    <div v-if="owner" class="row">
+                        <div class="col">
+                            <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
+                                進入遊戲
+                            </div>
+                            <div v-if="roomState === 'notOpen'" @click="openPlayer()" class="btn btn-primary">
+                                開放玩家
+                            </div>
+                            <div v-if="roomState === 'opening'" @click="startGame()" class="btn btn-primary">
+                                開始遊戲
+                            </div>
+                            <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
+                                放棄本桌
+                            </div>              
+                        </div>
+                    </div>
+                    <div v-else class="row">
+                        <div class="col">
+                            <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
+                                進入遊戲
+                            </div>
+                            <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
+                                離開本桌
+                            </div>  
+                        </div>    
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
-            <div class="col-4">
-                <JaipurSetting v-if="gametype === 'jaipur'" v-bind:owner="owner" v-bind:opening="roomState"></JaipurSetting>
+            <div class="col-3">
+                <JaipurSetting v-if="gametype === 'jaipur'" v-bind:owner="owner" v-bind:roomState="roomState"></JaipurSetting>
             </div>
             <div class="col">
                 <TableSeat v-bind:playersInfo="playersInfo"></TableSeat>
             </div>
-        </div>
-        <!-- 場主才有的功能 -->
-        <div v-if="owner" class="row">
-            <div class="col offset-md-4">
-                <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
-                    進入遊戲
-                </div>
-                <div v-if="roomState === 'notOpen'" @click="openPlayer()" class="btn btn-primary">
-                    開放玩家
-                </div>
-                <div v-if="roomState === 'opening'" @click="startGame()" class="btn btn-primary">
-                    開始遊戲
-                </div>
-                <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
-                    放棄本桌
-                </div>              
-            </div>
-        </div>
-        <div v-else class="row">
-            <div class="col offset-md-4">
-                <div v-if="roomState === 'playing'" @click="enterGame()" class="btn btn-primary">
-                    進入遊戲
-                </div>
-                <div v-if="roomState !== 'playing'" @click="leaveGame()" class="btn btn-danger">
-                    離開本桌
-                </div>  
-            </div>    
         </div>
     </div>
 </template>
@@ -101,6 +113,7 @@
                         this.gameID = response.data.data.gameID[0];
 
                         this.getRoomInfo()
+                        this.wsInit()
                         return
                     } 
 
@@ -288,5 +301,15 @@
 </script>
 
 <style lang="scss" scoped>
-
+#JaipurRoom {
+    padding: 15px;
+    .gameBoard {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        height: 250px;
+        border: solid 1px;
+        padding: 15px;
+        border-radius: 5px;
+    }
+}   
 </style>
