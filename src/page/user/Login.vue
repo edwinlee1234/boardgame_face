@@ -32,40 +32,49 @@
 </template>
 
 <script>
-    export default {
-        name: 'Login',
+  import * as errorCode from '@/config/errorcode'
 
-        data () {
-            return {
-              userName: '',
-              password: ''
-            }
-        },
+  export default {
+      name: 'Login',
 
-        methods: {
-          login() {
-            axios({
-                method: "post",
-                url: APIURL + '/api/user/login',
-                responseType: 'json',
-                data: {
-                  userName: this.userName,
-                  password: this.password                    
-                }
-            })              
-            .then((response) => {
-              if (response.data.status === "success") {
-                alert("登入成功")
-                window.location = BASE + "gamelobby"
-                window.location.reload(true);
-              }
-            })
-            .catch((error) => {
-              console.log(error)
-            });
+      data () {
+          return {
+            userName: '',
+            password: ''
           }
+      },
+
+      methods: {
+        login() {
+          axios({
+              method: "post",
+              url: APIURL + '/api/user/login',
+              responseType: 'json',
+              data: {
+                userName: this.userName,
+                password: this.password                    
+              }
+          })              
+          .then((response) => {
+            if (response.data.status === "success") {
+              alert("登入成功")
+              window.location = BASE + "gamelobby"
+              window.location.reload(true);
+
+              return
+            }
+          })
+          .catch((error) => {
+            const response = error.response
+
+            if (response.data.error.error_code === errorCode.LOGIN_WORNG) {
+              alert("帳號密碼錯誤")
+              return
+            }
+          });
         }
-    }
+      }
+  }
 </script>
 
 <style lang="scss" scoped>

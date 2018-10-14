@@ -116,6 +116,9 @@
                         this.wsInit()
                         return
                     } 
+                })
+                .catch(function (error) {
+                    const response = error.response
 
                     if (response.data.error.error_code === errorCode.EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE) {
                         alert("已存在舊遊戲，不可開新局")
@@ -130,9 +133,6 @@
                     }
 
                     window.location = BASE + "gamelobby";
-                })
-                .catch(function (error) {
-                    console.log(error);
                 });  
             },
 

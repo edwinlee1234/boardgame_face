@@ -35,7 +35,7 @@
                     <a href="#">
                         <router-link to="/">Hello! {{ userName }} 會員中心</router-link>
                     </a>
-                    <a href="#">
+                    <a href="#" @click="logout()">
                         <router-link to="/">登出</router-link>
                     </a>                    
                 </span>   
@@ -77,6 +77,23 @@
                 window.location = BASE + "game/room/" + this.gameType + "/" + this.gameID;
                 window.location.reload(true);
                 return;
+            },
+
+            logout() {
+                axios({
+                    method: 'put',
+                    url: APIURL + '/api/user/logout',
+                })
+                .then((response) => {
+                    if (response.data.status === "success") {
+                        window.location = BASE;
+                        window.location.reload(true);
+                        return;
+                    }             
+                })
+                .catch(function (error) {
+                    console.log(error);
+                }); 
             }
         }
     }

@@ -19,7 +19,7 @@ export default {
     // Init user Info
     axios({
         method: 'get',
-        url: APIURL + '/init',
+        url: APIURL + '/api/init',
         responseType: 'json',
     })              
     .then((response) => {

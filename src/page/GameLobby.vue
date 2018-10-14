@@ -191,8 +191,11 @@
 
                         window.location = BASE + "game/room/" + gameType + "/" + gameID;
                         return
-                    }
-
+                    }                 
+                })
+                .catch(function (error) {
+                    const response = error.response
+                    
                     if (response.data.error.error_code === errorCode.EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE) {
                         alert("已有加入遊戲，不可再加入新局")
                         return
@@ -201,10 +204,7 @@
                     if (response.data.error.error_code === errorCode.NOT_AUTHORIZATION) {
                         alert("請先登入")
                         return
-                    }                    
-                })
-                .catch(function (error) {
-                    console.log(error);
+                    }   
                 });                
             },
 
