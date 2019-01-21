@@ -2,6 +2,7 @@ import * as TYPES from '../type'
 
 export default {
   state: {
+    userID: undefined,
     userName: undefined,
     gameID: undefined,
     gameType: undefined
@@ -27,6 +28,10 @@ export default {
   },
 
   getters: {
+    getUserID(state) {
+      return state.userID
+    },
+
     getUserName(state) {
       return state.userName
     },

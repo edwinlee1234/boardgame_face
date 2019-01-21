@@ -14,7 +14,7 @@ axios.defaults.withCredentials = true;
 
 window.BASE = "http://localhost:8787/#/";
 window.APIURL = "http://localhost:8300";
-window.WSURL = "localhost:8300";
+window.WSURL = "localhost:8000";
 window.LOBBYWS = null;
 window.GAMEWS = null;
 

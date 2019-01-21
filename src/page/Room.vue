@@ -110,7 +110,7 @@
                 })
                 .then((response) => {
                     if (response.data.status === "success") {
-                        this.gameID = response.data.data.gameID[0];
+                        this.gameID = response.data.data.gameID;
 
                         this.getRoomInfo()
                         this.wsInit()
@@ -192,6 +192,7 @@
                         let id = res.data.gameID
                         let gameType = res.data.gameType
                         window.location = BASE + "game/view/" + gameType + "/" + id;
+                        window.location.reload(true);
                         return
                     }      
                     
@@ -252,7 +253,8 @@
                         let id = response.data.data.gameID
                         let gameType = response.data.data.gameType
                         window.location = BASE + "game/view/" + gameType + "/" + id;
-
+                        window.location.reload(true);
+                        
                         return;
                     }
 

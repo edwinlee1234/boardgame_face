@@ -182,8 +182,8 @@
                 })
                 .then((response) => {
                     if (response.data.status === "success") {
-                        let gameID = response.data.data.gameID[0]
-                        let gameType = response.data.data.gameType[0]
+                        let gameID = response.data.data.gameID
+                        let gameType = response.data.data.gameType
                         this.$store.dispatch('setUserInfo', {
                             gameID: gameID,
                             gameType: gameType,
