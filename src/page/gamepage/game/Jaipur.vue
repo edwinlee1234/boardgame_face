@@ -1,78 +1,81 @@
 <template>
     <div id="jaipur-game-page">
-        <div class="action-bar" v-if="this.userID == actionPlayer">
+        <div class="action-bar" v-if="this.userID == actionPlayer && !this.gameOver">
             <div class="action-btn" v-for="(action, index) in actionChoose" :key="index">
-                <button type="button" class="btn btn-primary" @click="playerAction(action)">{{action}}</button>
+                <button type="button" class="btn btn-outline-primary" @click="playerAction(action)">{{action}}</button>
             </div>
         </div>
         <div id="game-canvas">
             <div class="card-point">
                 <div class="diamond" v-if="cardsPoint">
                     <div class="point">
-                        <span>diamond: </span>
-                        <span v-for="(point ,index) in cardsPoint.diamond" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">diamond: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.diamond" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>
                 </div>    
                 <div class="gold" v-if="cardsPoint">
                     <div class="point">
-                        <span>Gold: </span>
-                        <span v-for="(point ,index) in cardsPoint.gold" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">Gold: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.gold" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>
                 </div> 
                 <div class="sliver" v-if="cardsPoint">
                     <div class="point">
-                        <span>sliver: </span>
-                        <span v-for="(point ,index) in cardsPoint.sliver" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">sliver: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.sliver" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>                  
                 </div>
                 <!-- <div class="bonus" v-if="cardsPoint">
                     <span v-for="point in cardsPoint.leather" v-bind:key="point">
-                        {{ point }}
+                        <p>{{ point }}</p>
                     </span>                     
                 </div> -->
                 <div class="cloth" v-if="cardsPoint">
                     <div class="point">
-                        <span>cloth: </span>
-                        <span v-for="(point ,index) in cardsPoint.cloth" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">cloth: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.cloth" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>                      
                 </div>
                 <div class="spice" v-if="cardsPoint">
                     <div class="point">
-                        <span>spice: </span>
-                        <span v-for="(point ,index) in cardsPoint.spice" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">spice: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.spice" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>                     
                 </div>
                 <div class="leather" v-if="cardsPoint">
                     <div class="point">
-                        <span>leather: </span>
-                        <span v-for="(point ,index) in cardsPoint.leather" :key="index">
-                            {{ point }}
+                        <span class="point-type-img">leather: </span>
+                        <span class="point-img" v-for="(point ,index) in cardsPoint.leather" :key="index">
+                            <p>{{ point }}</p>
                         </span>
                     </div>                     
                 </div>
             </div>
             <div class="fold-card">
-                <h3>{{ foldCardNum }}</h3>
+                <div class="fold-card-img">
+                    <h3>{{ foldCardNum }}</h3>
+                </div>    
             </div>
             <div class="cards">
                 <div class="opponent">
                     <span class="card-img" v-for="index in opponentCardNum" :key="index">
 
                     </span>
-
-                    <div class="camel-img" v-if="opponentHaveCamel">
-                        <p>Camel</p>
-                    </div>
+                </div>
+                <div class="opponent-camel">
+                    <span class="camel-img" v-if="opponentHaveCamel">
+                        Camel
+                    </span>
                 </div>
                 <div class="desk-card">
                     <span class="card-img" v-for="(card, index) in deskCard" :key="index" @click="toggleCard('desk', index)" :class="{selected: selectedDeskCard.indexOf(index) !== -1}">
@@ -83,23 +86,24 @@
                     <span class="card-img" v-for="(card, index) in card" :key="index" @click="toggleCard('selfCard', index)" :class="{selected: selectedSelfCard.indexOf(index) !== -1}">
                         {{ card }}
                     </span>
-                    <div>
-                        <span class="camel-img" v-for="index in camel" @click="toggleCard('camel', index)" :class="{selected: selectedCamelCard.indexOf(index) !== -1}">
-                            Camel
-                        </span>
-                    </div>
+                </div>
+                <div class="self-camel">
+                    <span class="camel-img" v-for="index in camel" @click="toggleCard('camel', index)" :class="{selected: selectedCamelCard.indexOf(index) !== -1}">
+                        Camel
+                    </span>
                 </div>
             </div>
         </div>
         <div id="user-info">
             <div class="user">
                 <div class="player" v-for="(player, index) in players" :key="index">
-                    <p>{{ player.name }}</p>
                     <span v-if="player.id == actionPlayer">*</span>
+                    <span>{{ player.name }}</span>
                     <div v-if="player.id == userID">
-                        <div>Point: {{ point }}</div>
-                        <span v-for="(point, index) in bonus" :key="index">
-                            {{ point }}
+                        <span>Point: </span><span>{{ point }}</span>
+                        <br>
+                        <span class="player-bonus-point" v-for="(bonusPoint, index) in bonus" :key="index">
+                            <p>{{ bonusPoint }}</p>
                         </span>
                     </div>
                 </div>
@@ -109,8 +113,15 @@
             </div>
         </div>
 
-        <div class="win" v-if="gameOver">
-            
+        <div class="win-box" v-if="gameOver">
+            <p>遊戲結束</p>
+            <hr>
+            <div class="win-box-player" v-for="(info, index) in gameOverInfo" :key=index>
+                <p>玩家名稱: {{ info.userName }} <span v-if="info.winner">Winner!</span></p>
+                <p>分數: {{ info.point }}</p>
+                <hr>
+            </div>
+            <div class="btn btn-primary" @click="backLobby">Back</div>
         </div>
     </div>
 </template>
@@ -155,10 +166,25 @@
         },
 
         mounted() {
+            this.$store.dispatch('setUserInfo', {page: "game"})
             this.open()
-
-            // Test
             this.actionChoose = ["take", "sell", "switch"]
+
+            // // Test
+            // this.gameOver = true
+            // this.gameOverInfo.push(
+            //     {
+            //         userName: 'edwin',
+            //         point: 70,
+            //         winner: true,
+            //     },
+            //     {
+            //         userName: 'test',
+            //         point: 60,
+            //         winner: false,                    
+            //     }
+            // )
+            // // EndTest
         },
 
         methods: {
@@ -345,10 +371,18 @@
                 .then((res) => {
                     if (res.data.status === "success") {
                         this.players = res.data.data.players
+                        return
                     }
+
+                    // 讀不到遊戲資訊，回到lobby
+                    window.location = BASE + "gamelobby";
+                    window.location.reload(true);
                 })
                 .catch(function (error) {
                     console.log(error)
+                    // 讀不到遊戲資訊，回到lobby
+                    window.location = BASE + "gamelobby";
+                    window.location.reload(true);
                 });  
             },
 
@@ -521,17 +555,33 @@
                 this.cardsPoint.sliver.reverse()
                 this.cardsPoint.cloth.reverse()
             },
+
+            backLobby() {
+                window.location = BASE + "gamelobby";
+                window.location.reload(true);
+            },
         }
     }
 </script>
 
 <style lang="scss" scoped>
-*{
+%card {
+    display: inline-block;
+    position: relative;
+    height: 135px;
+    width: 105px;
+    margin-left: 3px;
+    margin-right: 3px;
     border: solid 1px;
+    border-radius: 5%;
+}
+
+*{
+    // border: solid 1px;
 }
 
 .selected {
-    border: solid 1px red;
+    border: solid 1px red !important;
 }
 
 .action-bar {
@@ -542,62 +592,137 @@
     width: 500px;
     height: 50px;
     z-index: 1;
-    background-color: grey;
     margin-left: -250px;
     font-size: 20px;
+    margin-top: 10px;
 
     .action-btn{
         display: inline-block;
         cursor: pointer;
+        button{
+            margin-left: 5px;
+            margin-right: 5px;
+            width: 150px;
+        }
     }
 }
 
 #jaipur-game-page{
     vertical-align: top;
     
-    border: solid 1px;
+    // border: solid 1px;
     #game-canvas{
+        margin-top: 15px;
         position: relative;
         display: inline-block;
-        height: 800px;
-        width: 1400px;
+        width: 1430px;
         vertical-align: top;
 
         .card-point{
             vertical-align: top;
             display: inline-block;
             height: 100%;
-            width: 300px;
+            width: 320px;
 
             .point {
                 height: 100px;
+            }
+
+            .point-type-img {
+                position: relative;
+                width: 50px;
+                margin-right: 3px;
+                font-size: 10px;
+                display: inline-block;
+            }
+
+            .point-img{
+                font-size: 15px;
+                display: inline-block;
+                border: solid 1px;
+                border-radius: 50%; 
+                height: 25px;
+                width: 25px;
+                p {
+                    padding-left: 5.5px;
+                }
             }
         }
         .fold-card{
             display: inline-block;
             height: 100%;
-            width: 200px;
+            width: 150px;
+            
+            .fold-card-img{
+                @extend %card;
+                margin-top: 170px;
+                h3 {
+                    margin-top: 50px;
+                    padding-left: 35px;
+                }
+            }
         }
         .cards{
             display: inline-block;
             height: 100%;
-            width: 800px;
+            width: 930px;
             vertical-align: top;
             .card-img{
-                display: inline-block;
-                position: relative;
-                height: 100px;
-                width: 80px;
+                @extend %card;
             }
 
+        }
+
+        .desk-card {
+            height: 135px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .self-card {
+            height: 135px;
+            margin-bottom: 5px;
+        }
+
+        .opponent {
+            display: inline-block;
+            height: 135px;
+            margin-bottom: 5px;
+        }
+
+        .opponent-camel {
+            vertical-align: top;
+            position: relative;
+            display: inline-block;
+            height: 135px;
+        }
+
+        .self-camel {
+            height: 135px;
         }
     }
 
     #user-info{
+        margin-top: 10px;
         vertical-align: top;
+        position: relative;
         display: inline-block;
         width: 200px;
         height: 600px;
+        right: 0px;
+        .player {
+            border-radius: 5%;
+            padding: 5px;
+            border: solid 1px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            height: 100px;
+        }
+
+        .player-bonus-point {
+            display: inline-block;
+            margin: 2px;
+        }
     }
 
     .card-point{
@@ -606,9 +731,21 @@
     }
 
     .camel-img {
-        display: inline-block;
-        width: 50px;
-        height: 70px;
+        vertical-align: top;
+        @extend %card;
+    }
+
+    .win-box {
+        position: absolute;
+        top: 200px;
+        left: 35%;
+        width: 450px;
+        height: 325px;
+        padding: 10px;
+        z-index: 1;
+        border: solid 1px;
+        border-radius: 5px;
+        background-color: white;
     }
 }
 </style>

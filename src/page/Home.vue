@@ -46,7 +46,7 @@
         },
 
         mounted() {
-
+          this.$store.dispatch('setUserInfo', {page: "home"})
         },
 
         methods: {

@@ -5,7 +5,9 @@ export default {
     userID: undefined,
     userName: undefined,
     gameID: undefined,
-    gameType: undefined
+    gameType: undefined,
+    // 使用者在那一頁
+    page: undefined,
   },
 
   mutations: {
@@ -42,6 +44,10 @@ export default {
     
     getGameType(state) {
       return state.gameType
+    },
+
+    getPage(state) {
+      return state.page
     }
   }
 }

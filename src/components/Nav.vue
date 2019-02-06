@@ -41,7 +41,7 @@
                 </span>   
             </div>
 
-            <div class="existGameBar" v-if="gameID && gameType">
+            <div class="existGameBar" v-if="gameID && gameType && (page != 'game' && page != 'room')">
                 <p @click="redirect()">你已有加入遊戲 #{{ gameID }}:{{ gameType }}</p>
             </div>
         </nav>
@@ -64,6 +64,7 @@
                 userName: 'getUserName',
                 gameID: 'getGameID',
                 gameType: 'getGameType',
+                page: 'getPage',
             })
         },
 

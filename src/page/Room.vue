@@ -90,52 +90,13 @@
         },
 
         mounted() {
-            // 從開始遊戲進來這邊id會是0
-            console.log(this.gameID)
-            if (this.gameID == '0') {
-                this.createGame()
-                this.owner = true
-            } else {
-                this.wsInit()
-                this.getRoomInfo()
-            }
+            this.$store.dispatch('setUserInfo', {page: "room"})
+            
+            this.wsInit()
+            this.getRoomInfo()
         },
 
         methods: {
-            createGame() {
-                axios({
-                    method: "put",
-                    url: APIURL + '/api/creategame?game=' + this.gametype,
-                    responseType: 'json',
-                })
-                .then((response) => {
-                    if (response.data.status === "success") {
-                        this.gameID = response.data.data.gameID;
-
-                        this.getRoomInfo()
-                        this.wsInit()
-                        return
-                    } 
-                })
-                .catch(function (error) {
-                    const response = error.response
-
-                    if (response.data.error.error_code === errorCode.EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE) {
-                        alert("已存在舊遊戲，不可開新局")
-                    }
-
-                    if (response.data.error.error_code === errorCode.NOT_AUTHORIZATION) {
-                        alert("請先登入")
-                    }
-
-                    if (response.data.error.error_code === errorCode.UNEXPECT_ERROR) {
-                        alert("SYETEM ERROR")
-                    }
-
-                    window.location = BASE + "gamelobby";
-                });  
-            },
-
             wsInit() {
                 // 連線ws
                 this.conn = GAMEWS; 
@@ -161,7 +122,13 @@
                             gameID: response.data.gameID,
                             gameType: response.data.gameType
                         })
+
+                        return
                     }
+
+                    // 讀不到Room資訊，回到lobby
+                    window.location = BASE + "gamelobby";
+                    window.location.reload(true);
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -221,7 +188,7 @@
 
             // 開放玩家進場
             openPlayer() {
-                let self = this;
+                let self = this
 
                 axios({
                     method: 'put',
@@ -229,19 +196,24 @@
                 })
                 .then(function(response) {
                     if (response.data.status == "success") {
-                        console.log(response.data);
-                        self.roomState = "opening";
+                        console.log(response.data)
+                        self.roomState = "opening"
                     }
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    console.log(error)
                 });
             },
 
             startGame() {
                 // owner的功能
                 if(!this.owner) {
-                    return;
+                    return
+                }
+
+                if (this.playersInfo.length <= 1) {
+                    alert("請等待其他玩家加入")
+                    return
                 }
 
                 axios({

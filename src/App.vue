@@ -16,22 +16,28 @@ export default {
   },
 
   mounted() {
-    // Init user Info
-    axios({
-        method: 'get',
-        url: APIURL + '/api/init',
-        responseType: 'json',
-    })              
-    .then((response) => {
-      if (response.data.status === 'success') {
-        this.$store.dispatch('setUserInfo', response.data)
-      } else {
-        console.log('init ERROR')
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    this.init()
+  },
+
+  methods: {
+    init() {
+      // Init user Info
+      axios({
+          method: 'get',
+          url: APIURL + '/api/init',
+          responseType: 'json',
+      })              
+      .then((response) => {
+        if (response.data.status === 'success') {
+          this.$store.dispatch('setUserInfo', response.data)
+        } else {
+          console.log('init ERROR')
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    },
   }
 }
 </script>

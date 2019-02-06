@@ -72,30 +72,11 @@
         },
 
         mounted() {
-            // 取得遊戲清單
-            axios.get(APIURL + '/api/gamesupport')
-            .then((response) => {
-                if (response.data.status == "success") {
-                  this.games = response.data.data.games
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+            // record page
+            this.$store.dispatch('setUserInfo', {page: "lobby"})
 
-            // Room list
-            axios.get(APIURL + '/api/roomlist')
-            .then((response) => {
-                if (response.data.status == "success") {
-                    if (response.data.roomlist) {
-                        this.openingGames = response.data.roomlist
-                        console.log(this.openingGames)
-                    }
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });            
+            this.getSupportGame()
+            this.getRoomList()
 
             // lobby的推播
             this.conn = LOBBYWS;
@@ -105,23 +86,52 @@
         },
 
         methods: {
+            getSupportGame() {
+                // 取得遊戲清單
+                axios.get(APIURL + '/api/gamesupport')
+                .then((response) => {
+                    if (response.data.status == "success") {
+                    this.games = response.data.data.games
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+
+            getRoomList() {
+                // Room list
+                axios.get(APIURL + '/api/roomlist')
+                .then((response) => {
+                    if (response.data.status == "success") {
+                        if (response.data.roomlist) {
+                            this.openingGames = response.data.roomlist
+                            console.log(this.openingGames)
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            },
+
             open() {
-                let self = this;
-                this.conn = new WebSocket("ws://" + WSURL + "/ws?channel=lobby");
-                LOBBYWS = this.conn;
-                console.log(this.conn);
+                let self = this
+                this.conn = new WebSocket("ws://" + WSURL + "/ws?channel=lobby")
+                LOBBYWS = this.conn
+                console.log(this.conn)
 
                 this.conn.onclose = function (evt) {
-                    console.log(evt);
-                    console.log("WebSocket Close");
+                    console.log(evt)
+                    console.log("WebSocket Close")
                     self.conn = null
                 };
 
                 this.conn.onmessage = function (evt) {
-                    let res = JSON.parse(evt.data);
+                    let res = JSON.parse(evt.data)
 
                     if (res.event == "openGame") {
-                        self.openingGames.push(res.data);
+                        self.openingGames.push(res.data)
                     }
 
                     if (res.event == "RoomChange") {
@@ -133,6 +143,18 @@
                                 self.openingGames[i].gameType = res.data.gameType
                             }
                         }
+                    }
+
+                    if (res.event == "CloseRoom") {
+                        let delRoomKey = ""
+                        for (let i = 0; i < self.openingGames.length; i++) {
+                            if (self.openingGames[i].gameID == res.gameID) {
+                                delRoomKey = i
+                                break
+                            } 
+                        }
+
+                        self.openingGames.splice(delRoomKey, 1)
                     }
                 };
             },
@@ -162,7 +184,33 @@
                     return
                 }
 
-                window.location = BASE + "game/room/" + gameType + "/0";
+                axios({
+                    method: "put",
+                    url: APIURL + '/api/creategame?game=' + gameType,
+                    responseType: 'json',
+                })
+                .then((response) => {
+                    if (response.data.status === "success") {
+                        window.location = BASE + "game/room/" + gameType + "/" + response.data.data.gameID;
+
+                        return
+                    } 
+                })
+                .catch(function (error) {
+                    const response = error.response
+
+                    if (response.data.error.error_code === errorCode.EXIST_GAME_NOT_ALLOW_TO_CREATE_NEW_ONE) {
+                        alert("已存在舊遊戲，不可開新局")
+                    }
+
+                    if (response.data.error.error_code === errorCode.NOT_AUTHORIZATION) {
+                        alert("請先登入")
+                    }
+
+                    if (response.data.error.error_code === errorCode.UNEXPECT_ERROR) {
+                        alert("SYETEM ERROR")
+                    }
+                });  
             },
 
             joinGame(joinGameID) {
