@@ -78,7 +78,7 @@
                     </span>
                 </div>
                 <div class="desk-card">
-                    <span class="card-img" v-for="(card, index) in deskCard" :key="index" @click="toggleCard('desk', index)" :class="{selected: selectedDeskCard.indexOf(index) !== -1}">
+                    <span class="card-img" v-for="(card, index) in deskCard" :type="card" :key="index" @click="toggleCard('desk', index)" :class="{selected: selectedDeskCard.indexOf(index) !== -1}">
                         {{ card }}
                     </span>
                 </div>
@@ -128,6 +128,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
+    import * as tool from '@/lib/tool'
 
     export default {
         name: 'Jaipur',
@@ -355,6 +356,33 @@
                 }
 
                 let position = card.indexOf(index)
+
+                // 特殊邏輯 選camel的話，其他都一起選
+                if (type === 'desk' && this.deskCard[index] === 'camel') {
+                    console.log("camel")
+                    if (position === -1) {
+                        // 找出全部camel推進去
+                        for (let i = 0; i < this.deskCard.length; i++) {
+                            if (this.deskCard[i] === 'camel') {
+                                card.push(i)
+                            }
+                        }
+                    } else {
+                        console.log(card)
+                        let delKey = []
+                        for (let i = 0; i < card.length; i++) {
+                            console.log(card[i])
+                            console.log(this.deskCard[card[i]])
+                            delete card[i]
+                        }
+                        tool.array_values(card)
+                        console.log(card)  
+                        console.log(this.selectedDeskCard)          
+                    }
+
+                    return
+                }
+
                 if (position === -1) {
                     card.push(index)
                 } else {
